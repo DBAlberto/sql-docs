@@ -130,7 +130,30 @@ Perform these instructions while logged in to Windows as a member of the local a
 11. Right-click your server name, and then click **Restart**. Make sure to start [!INCLUDE[ssNoVersion](../../includes/ssnoversion-md.md)] Agent again if you stopped it before starting [!INCLUDE[ssNoVersion](../../includes/ssnoversion-md.md)] in single-user mode.
   
 Now you should be able to connect normally with one of the accounts which is now a member of the **sysadmin** fixed server role.  
-  
+ 
+ 
+```powershell
+# Specify a startup parameter 
+New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQLServer\Parameters" -Name "SQLArg3" -PropertyType String -Value "-m"
+#Disable SQL Server Agent
+Set-Itemproperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\SQLSERVERAGENT" -Name "Start" -Value 4
+
+#Stop SQL Server Agent and restart SQL Server Engine service
+Stop-Service -Name "SQLSERVERAGENT" -Force
+Restart-Service -Name "MSSQLSERVER" -Force
+#Connect to SQL Server instance and create a New loging with sysadmin privilege 
+Invoke-Sqlcmd -Query "CREATE LOGIN [CONTOSO\PatK] FROM WINDOWS; ALTER SERVER ROLE sysadmin ADD MEMBER [CONTOSO\PatK];" -ServerInstance "localhost"
+
+#Rollback all changes
+Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQLServer\Parameters" -Name "SQLArg3" 
+#Enable SQL Server Agent to start in Automatic mode
+Set-Itemproperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\SQLSERVERAGENT" -Name "Start" -Value 2
+
+Restart-Service -Name "MSSQLSERVER" 
+Start-Service -Name "SQLSERVERAGENT" 
+```
+
+ 
 ## See Also  
 
 * [Configure server startup options](../../database-engine/configure-windows/scm-services-configure-server-startup-options.md)
