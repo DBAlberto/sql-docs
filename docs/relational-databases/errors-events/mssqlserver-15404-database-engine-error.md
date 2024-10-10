@@ -36,5 +36,6 @@ If this error is the result of a lack of a full trust relationship between the [
   
 -   If [!INCLUDE[ssNoVersion](../../includes/ssnoversion-md.md)] is using a machine account such as Network Service or Local System, the machine must be trusted by the domain containing the Windows User.  
   
--   Use a [!INCLUDE[ssNoVersion](../../includes/ssnoversion-md.md)] account.  
+-   Use a [!INCLUDE[ssNoVersion](../../includes/ssnoversion-md.md)] account.
   
+-   If use a domain account for the [!INCLUDE[ssNoVersion](../../includes/ssnoversion-md.md)], ensure that domain account is not locked out from Active Directory.
